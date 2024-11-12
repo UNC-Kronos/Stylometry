@@ -1,0 +1,79 @@
+Abstract
+A more intuitive and secure approach to programming with objects distributed across trust boundaries is presented. The approach involves scarce objects and software to support markets in trading scarce objects "rights."
+Introduction
+Scarce objects are computational objects that like physical objects are finite and excludable, and force the client to either conserve or consume (use up) their own rights to use the object. References to scarce objects are bearer certificates with two key properties: (1) they are use-once or use-N-times tokens, and (2) like digital cash they are transferred using online clearing using "spent lists" to conserve the number of these scarce object references.
+
+Introduction
+
+
+Scarce objects, a.k.a. conserved objects, provide a user and programmer friendly metaphor for distributed objects interacting across trust boundaries. (To simplify the language, I will use the present tense to describe architectures and hypothetical software). Scarce objects also give us the ability to translate user preferences into sophisticated contracts, via the market translator described below. These innovations will enable us for the first time to break through the mental transaction cost barrier to micropayments and a micromarket economy.
+
+ 
+
+A scarce object is a software object (or one of its methods) which uses a finite and excludable resource -- be it disk space, network bandwidth, a costly information source such as a trade secret or a minimally delayed stock quotes, or a wide variety of other scarce resources used by online applications. Scarce objects constrain remote callers to invoke methods in ways that use only certain amounts of the resources and do not divulge the trade secrets. Furthermore, scarce object wrappers form the basis for an online economy of scarce objects that makes efficient use of the underlying scarce resources.
+
+Scarce objects are also a new security model. No security model to date has been widely used for distributing objects across trust boundaries. This is due to their obscure consequences, their origins in single-TCB computing, or both. The security of scarce objects is much more readily understood, since it is based on duplicating in computational objects the essential intuitive features of physical possessions. Our brains reason in much more sophisticated ways about physical objects than about computational objects. Scarce objects are thus readily understood by programmers and end users alike. Scarce objects lower mental transaction costs, which are the main barrier to sophisticated small-scale commerce on the Net. Finally, scarce objects will solve for the first time denial of service attacks, at all layers above the primitive scarce object implementation.
+
+The intuitive physical metaphor of scarce objects gives scarce objects the following basic properties:
+
+1. Conservation of atomic objects
+
+2. Hierarchical composition of objects (analogous to spatial composition)
+
+Closely related to these is a social property of objects critical to the success of economies:
+
+ 
+
+3. A clear delineation of property rights and responsibilities. In other words, minimal externalities. Property rights specify residual control and liability over states of the world for which specific obligations or rights are not completely specified in contracts.
+
+
+Property rights and contracts are highly evolved methodologies for dealing with economic objects and each other across trust boundaries. Scarce object architecture can reuse this working paradigm, because it reuses the mental model of the physical world in which this security paradigm was invented.
+
+ 
+
+With scarce objects, any computation across trust boundaries will have these properties of atomicity, conservation, composition, and the accompanying clear delineation of rights and responsibilities. This model is rather restrictive compared to what we are used to within trust boundaries. However, it will much more readily keep programmers from writing obscurely insecure code, which is easy to do with either ACLs, capabilities, or cryptography. Furthermore, conservation (scarcity) and lack of externalities are the two major assumptions of microeconomics, the study of commercial transactions across trust boundaries. So the scarce objects security model allows us to inherit a rich literature of formal reasoning about such systems.
+
+ 
+
+Scarce objects are, in other words, online commodities. These commodities may represent, typically, rights (or expectations) to services – the right to use an e-mail or news service (or a component of that bundle of rights, e.g. the right to use that service’s e-mail server), the right to upload or cache content, the “right” (here more like an expectation) to have e-mail read (digital postage to prevent spam), etc. Such service rights will usually be limited against the client by time or resource usage or number of invocations. When represented properly, by scarce objects, these services are conserved. Such “rights” or codified expectations are enforced against the server by reputation, by the “physics” of scarce objects, or both, in substitute for or in addition to expensive traditional legal means.
+
+ 
+
+Scarce objects may also represent unique or finite relationships between people and bits – names that correspond to addresses, ownership of trademarks, authorship of content, ownership of certain rights to content (which probably does not, for security reasons, include the right to exclude others from copying the bits), etc.
+
+ 
+
+Scarce objects are not a complete model of computation across trust boundaries. Indeed, there are many smart contracts that can be implemented with cryptographic protocols and/or secure hardware but not with scarce objects. What scarce objects provide is a straightforward basis for implementing, in an intuitively secure way, the anonymous commodity exchange economies formalized in microeconomics in a P2P fashion on the Internet.
+
+
+
+Another area important to scarce objects is in reasoning about supply chains. In distributed objects, the call graph is the supply chain. To stretch call graphs across trust boundaries, we must replace rigid client-server relationships with dynamically adaptable customer-supplier relationships. The ideal here is to create a rich toolset of exception handling across trust boundaries. Note that credit risks are a proper subset of supply chain risks. Ka-Ping Yee recently put the supply chain problem succinctly: "be wary of return values from objects you don't trust."
+
+ 
+
+Usage Control vs. Access Control
+
+
+The scarce object architecture suggested here shares some things in common with capabilities, but it secures more kinds of resources and is far more affordable for users and programmers. Capabilities (along with ACLs) are a means of implementing access control. Access control simply deals with the first-level of issue of whether an entity has access or not to a given resource. If an entity has such access, this access is, as modelled or implemented by basic capabilities or ACLs, effectively unlimited in scope. Scarce objects, on the other hand, limit resource usage in three ways -- first, by limiting the amount of resources used per invocation, second, by limiting the number of resources used per right (per ticket), and third, by limiting the number of tickets issued.
+
+
+Scarce Objects and POLA
+
+
+A raw distributed capability system (i.e. what Mark Miller refers to as "caps-as-data", to distinguish from capabilities local to the TCB ("object caps") which have strictly stronger security properties) give out capabilities of infinite duration and unlimited invocations, cannot be considered to be a true principle of least authority (POLA) system. For an object reference to implement POLA, it must be finite in every dimension. A true POLA system never gives out more authority than is necessary and proper to compute the needed function. It is never either necessary or proper to allocate infinite resources, and usually it is not necessary to allocate large resources. The scarce object architecture is the first design for object systems to achieve finite authority, and to allow small allocations for objects that need only small amounts of resources. Scarce objects are thus the first architecture to make true POLA possible.
+
+Scarce Object Architecture
+
+
+Scarce object architecture depends on a distributed object architecture that makes minimal security assumptions. A good implementation strategy may be therefore to implement this model on top of E. No sophisticated use of its distributecd capability architecture need be made to securely distribute scarce objects; rather the resource-conserving features of scarce objects can be relied on for securing resources.
+
+
+A bearer right to invoke a scarce object method takes the form of a bearer certificate, or ticket. It can be generic, meaning a right to an N invocations of one of a set of similar or identical objects, or specific, meaning a right to invoke a particular object method in a unique way. Generic rights are fungible and can be transferred unlinkably, using Chaumian blinding.
+
+
+The general steps to build a scarce object are (1) define a normal object, then (2) wrap it in a layer that protects its public methods using tickets. Our sketch of the architecture here describes how this wrapping layer can work.
+
+
+The wrapping layer involves three different servers: a transfer agent (TA), a Provider, and an Issuer. The Issuer and TA operate like an accountless digital cash mint. The Issuer signs tickets. The TA clears the transfer of tickets for generic rights. Both the Issuer and TA have copies of the private keys ("plates") corresponding to each issue of generic right. A particular kind of generic right (e.g., a particular denomination of digital coin) can have multiple issues, usually ordered sequentially. Digital cash is a special case: money is the most generic of rights. Here is another example of a generic right, or class of fungible objects: "A queriable SQL database with up to 10 MB of storage, and certain standard response time guaruntees".
+
+
