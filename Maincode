@@ -23,25 +23,30 @@ def clean_and_tokenize(text):
 def calculate_word_frequencies(words):
     return Counter(words)
 
-# Function to load and process text files for each author
+# Function to load and process text files for each author with encoding error handling
 def process_text_file(filename):
-    with open(filename, 'r', encoding='utf-8') as file:
-        text = file.read()
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            text = file.read()
+    except UnicodeDecodeError:
+        # Try reading the file with 'latin-1' encoding if 'utf-8' fails
+        with open(filename, 'r', encoding='latin-1') as file:
+            text = file.read()
     words = clean_and_tokenize(text)
     return calculate_word_frequencies(words)
 
 # Load and process text samples
-satoshi_frequencies = process_text_file('satoshi.txt')
-candidate1_frequencies = process_text_file('dorian_nakamoto.txt')
-candidate2_frequencies = process_text_file('hal_finney.txt')
-candidate3_frequencies = process_text_file('nick_szabo.txt')
+satoshi_frequencies = process_text_file('C:/Users/Eric/Downloads/satoshi_informal.txt')
+candidate1_frequencies = process_text_file('C:/Users/Eric/Downloads/dorian_nakamoto.txt')
+candidate2_frequencies = process_text_file('C:/Users/Eric/Downloads/hal_finney.txt')
+candidate3_frequencies = process_text_file('C:/Users/Eric/Downloads/nick_szabo.txt')
 
 # Define a common vocabulary (words appearing in any sample)
 all_words = set(satoshi_frequencies) | set(candidate1_frequencies) | set(candidate2_frequencies) | set(candidate3_frequencies)
 
-# Create frequency vectors for each text sample, using the common vocabulary
-def create_frequency_vector(word_counts, vocabulary):
-    return [word_counts[word] for word in vocabulary]
+# Create frequency vectors for each text sample, using the common vocabulary, with smoothing to avoid zero values
+def create_frequency_vector(word_counts, vocabulary, smoothing=1):
+    return [word_counts[word] + smoothing for word in vocabulary]
 
 vocabulary = sorted(all_words)
 satoshi_vector = create_frequency_vector(satoshi_frequencies, vocabulary)
