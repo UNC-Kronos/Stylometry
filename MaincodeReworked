@@ -1,0 +1,80 @@
+import nltk
+from nltk.corpus import stopwords
+from collections import Counter
+from scipy.stats import chi2_contingency
+import string
+
+# Download stopwords if not already installed
+nltk.download('stopwords')
+
+# Define stop words and punctuation
+stop_words = set(stopwords.words('english'))
+punctuation = set(string.punctuation)
+
+# Function to clean and tokenize text
+def clean_and_tokenize(text):
+    # Lowercase, remove punctuation, and split into words
+    words = text.lower().translate(str.maketrans('', '', string.punctuation)).split()
+    # Remove stop words
+    words = [word for word in words if word not in stop_words]
+    return words
+
+# Function to calculate word frequencies
+def calculate_word_frequencies(words):
+    return Counter(words)
+
+# Function to load and process text files for each author with encoding error handling
+def process_text_file(filename):
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            text = file.read()
+    except UnicodeDecodeError:
+        # Try reading the file with 'latin-1' encoding if 'utf-8' fails
+        with open(filename, 'r', encoding='latin-1') as file:
+            text = file.read()
+    words = clean_and_tokenize(text)
+    return calculate_word_frequencies(words)
+
+# Load and process text samples
+satoshi_frequencies = process_text_file('C:/Users/Eric/Downloads/satoshi_informal.txt')
+candidate1_frequencies = process_text_file('C:/Users/Eric/Downloads/dorian_nakamoto.txt')
+candidate2_frequencies = process_text_file('C:/Users/Eric/Downloads/hal_finney.txt')
+candidate3_frequencies = process_text_file('C:/Users/Eric/Downloads/nick_szabo.txt')
+
+# Define a common vocabulary (words appearing in any sample)
+all_words = set(satoshi_frequencies) | set(candidate1_frequencies) | set(candidate2_frequencies) | set(candidate3_frequencies)
+
+# Create frequency vectors for each text sample, using the common vocabulary, with smoothing to avoid zero values
+def create_frequency_vector(word_counts, vocabulary, smoothing=1):
+    return [word_counts[word] + smoothing for word in vocabulary]
+
+vocabulary = sorted(all_words)
+satoshi_vector = create_frequency_vector(satoshi_frequencies, vocabulary)
+candidate1_vector = create_frequency_vector(candidate1_frequencies, vocabulary)
+candidate2_vector = create_frequency_vector(candidate2_frequencies, vocabulary)
+candidate3_vector = create_frequency_vector(candidate3_frequencies, vocabulary)
+
+# Function to calculate chi-square similarity between two frequency vectors
+def calculate_chi_square(vector1, vector2):
+    contingency_table = [vector1, vector2]
+    chi2, p, dof, expected = chi2_contingency(contingency_table, correction=False)
+    return chi2
+
+# Calculate chi-square scores between Satoshi and each candidate
+chi_square_candidate1 = calculate_chi_square(satoshi_vector, candidate1_vector)
+chi_square_candidate2 = calculate_chi_square(satoshi_vector, candidate2_vector)
+chi_square_candidate3 = calculate_chi_square(satoshi_vector, candidate3_vector)
+
+# Print results
+print(f"Chi-square similarity with Dorian Nakamoto: {chi_square_candidate1}")
+print(f"Chi-square similarity with Hal Finney: {chi_square_candidate2}")
+print(f"Chi-square similarity with Nick Szabo: {chi_square_candidate3}")
+
+# Determine the most likely candidate based on the lowest chi-square score
+chi_square_scores = {
+    "Dorian Nakamoto": chi_square_candidate1,
+    "Hal Finney": chi_square_candidate2,
+    "Nick Szabo": chi_square_candidate3
+}
+most_likely_candidate = min(chi_square_scores, key=chi_square_scores.get)
+print(f"The candidate with the most stylistic similarity to Satoshi Nakamoto is: {most_likely_candidate}")
